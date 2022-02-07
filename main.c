@@ -46,8 +46,10 @@ int main(int argc, char **argv) {
 		exit(1);
 	}
 
+	// Main loop
 	int quit = 0;
 	while (!quit) {
+		// Check for event
 		SDL_Event event;
 		while (SDL_PollEvent(&event)) {
 			if (event.type == SDL_QUIT) {
@@ -55,14 +57,18 @@ int main(int argc, char **argv) {
 			}
 		}
 
+		// Setting the background color
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-
 		SDL_PumpEvents();
 
+		// Mouse stuff
 		int mouseX, mouseY;
-		int size = 20;
+		int size = 20;      // Diameter of the circle being drawn
 		Uint32 buttons = SDL_GetMouseState(&mouseX, &mouseY);
 
+		// Left click for drawing color
+		// Middle click for quitting
+		// Right click for 'erasing' - drawing with background color
 		if ((buttons & SDL_BUTTON_LMASK) != 0) {
 			SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 			DrawCircle(renderer, mouseX, mouseY, size);
@@ -73,19 +79,24 @@ int main(int argc, char **argv) {
 			DrawCircle(renderer, mouseX, mouseY, size);
 		}
 
+		// Present the renderer and wait 1/60th of a second, to get ~60 FPS
 		SDL_RenderPresent(renderer);
 		SDL_Delay(1000 / 60);
 	}
 
+	// Cleaning up
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
 }
 
+// Function for drawing a circle i stole from somewhere
+// and then modified to fill the circle
 void DrawCircle(SDL_Renderer * renderer, int x, int y, int radius) {
 	int offsetx, offsety, d;
 	int status;
 
+	// This little for loop is my addition
 	for (; radius > 0; radius--) {
 		offsetx = 0;
 		offsety = radius;
