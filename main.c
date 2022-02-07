@@ -1,3 +1,7 @@
+/*
+ * Dedicated to honey <3
+ */
+
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
