@@ -46,6 +46,34 @@ int main(int argc, char **argv) {
 		exit(1);
 	}
 
+	// The grey rectangle for the UI
+	SDL_Rect UIrect;
+	UIrect.w = WIDTH;
+	UIrect.h = 200;
+	UIrect.x = 0;
+	UIrect.y = HEIGHT - UIrect.h;
+	// The red, green, blue, white and black button
+	SDL_Rect RedRect;
+	RedRect.w = 100;
+	RedRect.h = 100;
+	RedRect.x = RedRect.h >> 1;
+	RedRect.y = HEIGHT - RedRect.h * 1.5;
+	SDL_Rect BlueRect;
+	BlueRect.w = 100;
+	BlueRect.h = 100;
+	BlueRect.x = (BlueRect.h >> 1) + 1.5 * BlueRect.h;
+	BlueRect.y = HEIGHT - BlueRect.h * 1.5;
+	SDL_Rect GreenRect;
+	GreenRect.w = 100;
+	GreenRect.h = 100;
+	GreenRect.x = (GreenRect.h >> 1) + 3 * GreenRect.h;
+	GreenRect.y = HEIGHT - GreenRect.h * 1.5;
+	SDL_Rect WhiteRect;
+	WhiteRect.w = 100;
+	WhiteRect.h = 100;
+	WhiteRect.x = (WhiteRect.h >> 1) + 4.5 * WhiteRect.h;
+	WhiteRect.y = HEIGHT - WhiteRect.h * 1.5;
+
 	// Main loop
 	int quit = 0;
 	while (!quit) {
@@ -78,6 +106,18 @@ int main(int argc, char **argv) {
 			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 			DrawCircle(renderer, mouseX, mouseY, size);
 		}
+
+		// Draw the UI elements
+		SDL_SetRenderDrawColor(renderer, 127, 127, 127, 255);
+		SDL_RenderFillRect(renderer, &UIrect);
+		SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+		SDL_RenderFillRect(renderer, &RedRect);
+		SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+		SDL_RenderFillRect(renderer, &BlueRect);
+		SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+		SDL_RenderFillRect(renderer, &GreenRect);
+		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+		SDL_RenderFillRect(renderer, &WhiteRect);
 
 		// Present the renderer and wait 1/60th of a second, to get ~60 FPS
 		SDL_RenderPresent(renderer);
