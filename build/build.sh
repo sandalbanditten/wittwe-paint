@@ -7,4 +7,4 @@ CFLAGS="-O2 -Wall -Werror -pedantic -std=c99 $(sdl2-config --cflags)"
 LIBS="$(sdl2-config --libs) -lm"
 BIN="wittwe"
 
-$CC $CFLAGS $LIBS $1 -o $BIN
+$CC $CFLAGS $LIBS $1 -o $BIN && mv $BIN ../bin/
