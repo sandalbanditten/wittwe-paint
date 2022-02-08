@@ -12,7 +12,24 @@
 #define WIDTH 1280
 #define HEIGHT 720
 
+struct {
+	Uint8 size;
+	Uint8 r;
+	Uint8 g;
+	Uint8 b;
+	Uint8 a;
+} Brush;
+
+struct Circle {
+	int x;
+	int y;
+	unsigned int diameter;
+} sizeCircles[5];
+
+struct SDL_Rect colorRects[4];
+
 void DrawCircle(SDL_Renderer * renderer, int x, int y, int radius);
+Uint8 RectCheckBounds(int x, int y, struct SDL_Rect Rect);
 
 int main(int argc, char **argv) {
 	printf("Hello, World!\n");
@@ -47,32 +64,31 @@ int main(int argc, char **argv) {
 	}
 
 	// The grey rectangle for the UI
-	SDL_Rect UIrect;
-	UIrect.w = WIDTH;
-	UIrect.h = 200;
-	UIrect.x = 0;
-	UIrect.y = HEIGHT - UIrect.h;
-	// The red, green, blue, white and black button
-	SDL_Rect RedRect;
-	RedRect.w = 100;
-	RedRect.h = 100;
-	RedRect.x = RedRect.h >> 1;
-	RedRect.y = HEIGHT - RedRect.h * 1.5;
-	SDL_Rect BlueRect;
-	BlueRect.w = 100;
-	BlueRect.h = 100;
-	BlueRect.x = (BlueRect.h >> 1) + 1.5 * BlueRect.h;
-	BlueRect.y = HEIGHT - BlueRect.h * 1.5;
-	SDL_Rect GreenRect;
-	GreenRect.w = 100;
-	GreenRect.h = 100;
-	GreenRect.x = (GreenRect.h >> 1) + 3 * GreenRect.h;
-	GreenRect.y = HEIGHT - GreenRect.h * 1.5;
-	SDL_Rect WhiteRect;
-	WhiteRect.w = 100;
-	WhiteRect.h = 100;
-	WhiteRect.x = (WhiteRect.h >> 1) + 4.5 * WhiteRect.h;
-	WhiteRect.y = HEIGHT - WhiteRect.h * 1.5;
+	SDL_Rect UIrect = {
+		.w = WIDTH,
+		.h = 200,
+		.x = 0,
+		.y = HEIGHT - 200
+	};
+
+	for (int i = 0; i < 4; i++) {
+		colorRects[i].w = 100;
+		colorRects[i].h = 100;
+		colorRects[i].x = (colorRects[i].w >> 1) + 1.5 * i * colorRects[i].w;
+		colorRects[i].y = HEIGHT - colorRects[i].h * 1.5;
+	}
+
+	// Current settings - should probably be a struct
+	Uint8 sizeS = 5;
+	Uint8 sizeM = 15;
+	Uint8 sizeL = 25;
+	Brush.size = sizeL;
+	Brush.r = 0;
+	Brush.g = 0;
+	Brush.b = 0;
+
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+	SDL_RenderClear(renderer);
 
 	// Main loop
 	int quit = 0;
@@ -86,38 +102,46 @@ int main(int argc, char **argv) {
 		}
 
 		// Setting the background color
-		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 		SDL_PumpEvents();
 
 		// Mouse stuff
 		int mouseX, mouseY;
-		int size = 20;      // Diameter of the circle being drawn
 		Uint32 buttons = SDL_GetMouseState(&mouseX, &mouseY);
 
 		// Left click for drawing color
 		// Middle click for quitting
 		// Right click for 'erasing' - drawing with background color
 		if ((buttons & SDL_BUTTON_LMASK) != 0) {
-			SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-			DrawCircle(renderer, mouseX, mouseY, size);
+			for (int i = 0; i < 4; i++) {
+				if (RectCheckBounds(mouseX, mouseY, colorRects[i])) {
+					Brush.r = 255 * (i == 0);
+					Brush.g = 255 * (i == 1);
+					Brush.b = 255 * (i == 2);
+				}
+			}
+			SDL_SetRenderDrawColor(renderer, Brush.r, Brush.g, Brush.b, Brush.a);
+			DrawCircle(renderer, mouseX, mouseY, Brush.size);
 		} else if ((buttons & SDL_BUTTON_MMASK) != 0) {
 			quit = 1;
 		} else if ((buttons & SDL_BUTTON_RMASK) != 0) {
-			SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-			DrawCircle(renderer, mouseX, mouseY, size);
+			SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+			DrawCircle(renderer, mouseX, mouseY, Brush.size);
 		}
 
 		// Draw the UI elements
 		SDL_SetRenderDrawColor(renderer, 127, 127, 127, 255);
 		SDL_RenderFillRect(renderer, &UIrect);
-		SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-		SDL_RenderFillRect(renderer, &RedRect);
-		SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-		SDL_RenderFillRect(renderer, &BlueRect);
-		SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
-		SDL_RenderFillRect(renderer, &GreenRect);
-		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-		SDL_RenderFillRect(renderer, &WhiteRect);
+	for (int i = 0; i < 4; i++) {
+		SDL_SetRenderDrawColor(renderer,
+				255 * (i == 0), 255 * (i == 1), 255 * (i == 2), 255);
+		SDL_RenderFillRect(renderer, &colorRects[i]);
+	}
+		// V Should be CurrentColor, when that is implemented
+		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+		DrawCircle(renderer, WIDTH - 50, HEIGHT - UIrect.h / 2, sizeL);
+		DrawCircle(renderer, WIDTH - 100, HEIGHT - UIrect.h / 2, sizeM);
+		DrawCircle(renderer, WIDTH - 125, HEIGHT - UIrect.h / 2, sizeS);
 
 		// Present the renderer and wait 1/60th of a second, to get ~60 FPS
 		SDL_RenderPresent(renderer);
@@ -128,6 +152,15 @@ int main(int argc, char **argv) {
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
+}
+
+// Checks if the given x and y is inside the given SDL_Rect
+Uint8 RectCheckBounds(int x, int y, struct SDL_Rect Rect) {
+	if (x > Rect.x && x < Rect.x + Rect.w && y > Rect.y && y < Rect.y + Rect.h) {
+		return 1;
+	} else {
+		return 0;
+	}
 }
 
 // Function for drawing a circle i stole from somewhere
