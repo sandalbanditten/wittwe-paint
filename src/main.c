@@ -3,6 +3,7 @@
  */
 
 #include "main.h"
+#include "circle.h"
 
 int main(int argc, char **argv) {
 	printf("Hello, World!\n");
@@ -44,19 +45,7 @@ int main(int argc, char **argv) {
 		.y = HEIGHT - 100
 	};
 
-	for (int i = 0; i < COLORS; i++) {
-		colorRects[i].w = 80;
-		colorRects[i].h = 80;
-		colorRects[i].x = i * colorRects[i].w + 10 * i + 10;
-		colorRects[i].y = HEIGHT - colorRects[i].h - 10;
-	}
-
-	// Fill the array of different available sizes
-	for (int i = 0; i < SIZES; i++) {
-		sizes[i] = 5 + 10 * i;
-	}
-
-	Brush.size = sizes[4];
+	Brush.size = 25;
 	Brush.r = 0;
 	Brush.g = 0;
 	Brush.b = 0;
@@ -83,21 +72,7 @@ int main(int argc, char **argv) {
 
 		// Left click for drawing color
 		if ((buttons & SDL_BUTTON_LMASK) != 0) {
-			// Loops through the different color rectangles
-			// if they are clicked on, sets the brush to the apropriate color
-			for (int i = 0; i < COLORS; i++) {
-				if (RectCheckBounds(mouseX, mouseY, colorRects[i])) {
-					Brush.r = 255 * (i == 0);
-					Brush.g = 255 * (i == 1);
-					Brush.b = 255 * (i == 2);
-				}
-			}
-			for (int i = 0; i < SIZES; i++) {
-				if (CircleCheckBounds(mouseX, mouseY, sizes[i])) {
-					Brush.size = sizes[i];
-				}
-			}
-			SDL_SetRenderDrawColor(renderer, Brush.r, Brush.g, Brush.b, Brush.a);
+			SDL_SetRenderDrawColor(renderer, Brush.r, Brush.g, Brush.b, 255);
 			DrawCircle(renderer, mouseX, mouseY, Brush.size);
 			// Middle click for quitting
 		} else if ((buttons & SDL_BUTTON_MMASK) != 0) {
@@ -112,18 +87,15 @@ int main(int argc, char **argv) {
 		SDL_SetRenderDrawColor(renderer, 127, 127, 127, 255);
 		SDL_RenderFillRect(renderer, &UIrect);
 
-		// Draw the color options
-		for (int i = 0; i < COLORS; i++) {
-			SDL_SetRenderDrawColor(renderer,
-					255 * (i == 0), 255 * (i == 1), 255 * (i == 2), 255);
-			SDL_RenderFillRect(renderer, &colorRects[i]);
-		}
+		// The size slider
+		slider(renderer, 1, WIDTH - 100.0f - 40.0f, HEIGHT - UIrect.h / 2, 100.0f, &Brush.size, 0, 31);
+		// Color sliders
+		slider(renderer, 2, 40.0f, HEIGHT - UIrect.h / 2, 127.0f, &Brush.r, 0, 255);
+		slider(renderer, 3, 127.0f + 80.0f, HEIGHT - UIrect.h / 2, 127.0f, &Brush.g, 0, 255);
+		slider(renderer, 4, 254.0f + 120.0f, HEIGHT - UIrect.h / 2, 127.0f, &Brush.b, 0, 255);
 
-		// Draws the circles for choosing size
-		SDL_SetRenderDrawColor(renderer, Brush.r, Brush.g, Brush.b, Brush.a);
-		for (int i = 0; i < SIZES; i++) {
-			DrawCircle(renderer, WIDTH - 500 + 100 * i, HEIGHT - UIrect.h / 2, sizes[i]);
-		}
+		SDL_SetRenderDrawColor(renderer, Brush.r, Brush.g, Brush.b, 255);
+		DrawCircle(renderer, 800.0f, HEIGHT - UIrect.h / 2, Brush.size);
 
 		// Present the renderer and wait 1/60th of a second, to get ~60 FPS
 		SDL_RenderPresent(renderer);
@@ -145,13 +117,86 @@ Uint8 RectCheckBounds(int x, int y, struct SDL_Rect Rect) {
 	}
 }
 
-// Checking if a point is inside a circle, using pythagores
-Uint8 CircleCheckBounds(int x, int y, Uint8 d) {
-	if (sqrt((float)(x * x + y * y)) < d) {
-		return 1;
-	} else {
-		return 0;
+static void slider(SDL_Renderer *renderer, int id,
+		float pos_x, float pos_y, float len,
+		Uint8 *value, float min, float max)
+{
+	// TODO: display the current value of the slider
+
+	// Slider Body
+	{
+		if (id == 1) {
+			SDL_SetRenderDrawColor(renderer, Brush.size * 8, Brush.size * 8, Brush.size * 8, 255);
+		} else {
+			SDL_SetRenderDrawColor(renderer, Brush.r * (id == 2), Brush.g * (id == 3), Brush.b * (id == 4), 255);
+		}
+		SDL_Rect rect = {
+			.x = pos_x,
+			.y = pos_y - SLIDER_THICCNESS * 0.5f,
+			.w = len,
+			.h = SLIDER_THICCNESS,
+		};
+		SDL_RenderFillRect(renderer, &rect);
 	}
+
+	// Grip
+	{
+		assert(min <= max);
+		float grip_value = ilerpf(min, max, *value) * len;
+
+		// TODO: the grip should go outside of the slider body
+
+		SDL_SetRenderDrawColor(renderer, 255 * (id == 2), 255 * (id == 3), 255 * (id == 4), 255);
+		SDL_Rect rect = {
+			.x = pos_x - SLIDER_GRIP_SIZE + grip_value,
+			.y = pos_y - SLIDER_GRIP_SIZE,
+			.w = SLIDER_GRIP_SIZE * 2.0f,
+			.h = SLIDER_GRIP_SIZE * 2.0f,
+		};
+		SDL_RenderFillRect(renderer, &rect);
+
+		int x, y;
+		Uint32 buttons = SDL_GetMouseState(&x, &y);
+
+		// TODO: the grip should maintain the initial offset between its position and mouse_x
+
+		if (active_id < 0) {
+			SDL_Point cursor = {x, y};
+			if (SDL_PointInRect(&cursor, &rect) && (buttons & SDL_BUTTON_LMASK) != 0) {
+				active_id = id;
+			}
+		} else {
+			if (active_id == id) {
+				if ((buttons & SDL_BUTTON_LMASK) == 0) {
+					active_id = -1;
+				} else {
+					float grip_min = pos_x - SLIDER_GRIP_SIZE;
+					float grip_max = grip_min + len;
+					float xf = clampf(x - SLIDER_GRIP_SIZE, grip_min, grip_max);
+					xf = ilerpf(grip_min, grip_max, xf);
+					xf = lerpf(min, max, xf);
+					*value = xf;
+				}
+			}
+		}
+	}
+}
+
+static inline float clampf(float v, float lo, float hi)
+{
+	if (v < lo) v = lo;
+	if (v > hi) v = hi;
+	return v;
+}
+
+static inline float lerpf(float a, float b, float t)
+{
+	return (b - a) * t + a;
+}
+
+static inline float ilerpf(float a, float b, float v)
+{
+	return (v - a) / (b - a);
 }
 
 // Function for drawing a circle i stole from somewhere
