@@ -55,15 +55,29 @@ int main(int argc, char **argv) {
 	// The button for resseting the canvas
 	SDL_Rect resetRect = {
 		.w = UIrect.h / 2,
-		.h = UIrect.h / 2,
+		.h = UIrect.h / 4,
+		.x = WIDTH / 2,
+		.y = HEIGHT - UIrect.h * 0.75f + UIrect.h / 4
+	};
+
+	SDL_Rect resetRect2 = {
+		.w = UIrect.h / 2,
+		.h = UIrect.h / 4,
 		.x = WIDTH / 2,
 		.y = HEIGHT - UIrect.h * 0.75f
 	};
 
-	SDL_Rect ScreenshotRect = {
+	SDL_Rect screenshotRect = {
 		.w = UIrect.h / 2,
 		.h = UIrect.h / 2,
 		.x = WIDTH / 2 + UIrect.h,
+		.y = HEIGHT - UIrect.h * 0.75f
+	};
+
+	SDL_Rect exitRect = {
+		.w = UIrect.h / 2,
+		.h = UIrect.h / 2,
+		.x = WIDTH / 2 + UIrect.h * 2,
 		.y = HEIGHT - UIrect.h * 0.75f
 	};
 
@@ -86,27 +100,26 @@ int main(int argc, char **argv) {
 		// Mouse stuff
 		Uint32 buttons = SDL_GetMouseState(&Brush.loc.x, &Brush.loc.y);
 
-		// Checks if mouse is not on UI
-		if (SDL_PointInRect(&Brush.loc, &CanvasRect)) {
-			if ((buttons & SDL_BUTTON_LMASK)) {
-				// Left click for drawing color
+		// Interacting with UI
+		if (buttons & SDL_BUTTON_LMASK) {
+			if (SDL_PointInRect(&Brush.loc, &CanvasRect)) {
 				SDL_SetRenderDrawColor(renderer, Brush.r, Brush.g, Brush.b, 255);
 				DrawCircle(renderer, Brush.loc.x, Brush.loc.y, Brush.size, 1);
-			} else if ((buttons & SDL_BUTTON_MMASK)) {
-				// Middle click for quitting
-				quit = 1;
-			} else if ((buttons & SDL_BUTTON_RMASK)) {
-				// Right click for 'erasing' - drawing with background color
-				SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-				DrawCircle(renderer, Brush.loc.x, Brush.loc.y, Brush.size, 1);
-			}
-		} else {
-			if ((buttons & SDL_BUTTON_LMASK) != 0 && SDL_PointInRect(&Brush.loc, &resetRect)) {
-				// Resets the canvas
+			} else if (SDL_PointInRect(&Brush.loc, &resetRect)) {
 				SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 				SDL_RenderClear(renderer);
-			} else if ((buttons & SDL_BUTTON_LMASK) != 0 && SDL_PointInRect(&Brush.loc, &ScreenshotRect)) {
+			} else if (SDL_PointInRect(&Brush.loc, &resetRect2)) {
+				SDL_SetRenderDrawColor(renderer, Brush.r, Brush.g, Brush.b, 255);
+				SDL_RenderClear(renderer);
+			} else if (SDL_PointInRect(&Brush.loc, &screenshotRect)) {
 				saveScreenshot("screenshot.bmp", renderer, CanvasRect);
+			} else if (SDL_PointInRect(&Brush.loc, &exitRect)) {
+				quit = 1;
+			}
+		} else if (buttons & SDL_BUTTON_RMASK) {
+			if (SDL_PointInRect(&Brush.loc, &CanvasRect)) {
+				SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+				DrawCircle(renderer, Brush.loc.x, Brush.loc.y, Brush.size, 1);
 			}
 		}
 
@@ -114,13 +127,21 @@ int main(int argc, char **argv) {
 		SDL_SetRenderDrawColor(renderer, 127, 127, 127, 255);
 		SDL_RenderFillRect(renderer, &UIrect);
 
-		// Reset button - First white fill, and then black outline
+		// Colored button
+		SDL_SetRenderDrawColor(renderer, Brush.r, Brush.g, Brush.b, 255);
+		SDL_RenderFillRect(renderer, &resetRect2);
+
+		// Buttons - First white fill, and then black outline
 		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 		SDL_RenderFillRect(renderer, &resetRect);
-		SDL_RenderFillRect(renderer, &ScreenshotRect);
+		SDL_RenderFillRect(renderer, &screenshotRect);
+		SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+		SDL_RenderFillRect(renderer, &exitRect);
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 		SDL_RenderDrawRect(renderer, &resetRect);
-		SDL_RenderDrawRect(renderer, &ScreenshotRect);
+		SDL_RenderDrawRect(renderer, &resetRect2);
+		SDL_RenderDrawRect(renderer, &screenshotRect);
+		SDL_RenderDrawRect(renderer, &exitRect);
 
 		// The size slider
 		slider(renderer, 1, WIDTH - 100.0f - 40.0f, HEIGHT - UIrect.h / 2, 100.0f, &Brush.size, 0, 31,
