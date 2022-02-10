@@ -8,9 +8,6 @@ This is version 2.0.0
 Some of the code in this program was taken from whine, a white noise generator.
 A fork of whine is on my GitHub.
 
-## TODO:
-* Saving the image
-
 ## Contribution
 
 Please do not contribute
