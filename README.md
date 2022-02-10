@@ -9,10 +9,7 @@ Some of the code in this program was taken from whine, a white noise generator.
 A fork of whine is on my GitHub.
 
 ## TODO:
-* Be able to export as png
-* Exit icon
-* Use SDL point in rec
-* Move function groups to seperate files
+* Saving the image
 
 ## Contribution
 
