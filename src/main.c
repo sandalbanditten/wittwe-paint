@@ -126,6 +126,8 @@ int main(int argc, char **argv) {
 		// Draw the UI elements
 		SDL_SetRenderDrawColor(renderer, 127, 127, 127, 255);
 		SDL_RenderFillRect(renderer, &UIrect);
+		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+		SDL_RenderDrawRect(renderer, &UIrect);
 
 		// Colored button
 		SDL_SetRenderDrawColor(renderer, Brush.r, Brush.g, Brush.b, 255);
