@@ -60,6 +60,13 @@ int main(int argc, char **argv) {
 		.y = HEIGHT - UIrect.h * 0.75f
 	};
 
+	SDL_Rect ScreenshotRect = {
+		.w = UIrect.h / 2,
+		.h = UIrect.h / 2,
+		.x = WIDTH / 2 + UIrect.h,
+		.y = HEIGHT - UIrect.h * 0.75f
+	};
+
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 	SDL_RenderClear(renderer);
 
@@ -98,6 +105,8 @@ int main(int argc, char **argv) {
 				// Resets the canvas
 				SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 				SDL_RenderClear(renderer);
+			} else if ((buttons & SDL_BUTTON_LMASK) != 0 && SDL_PointInRect(&Brush.loc, &ScreenshotRect)) {
+				saveScreenshot("screenshot.bmp", renderer, CanvasRect);
 			}
 		}
 
@@ -108,8 +117,10 @@ int main(int argc, char **argv) {
 		// Reset button - First white fill, and then black outline
 		SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 		SDL_RenderFillRect(renderer, &resetRect);
+		SDL_RenderFillRect(renderer, &ScreenshotRect);
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 		SDL_RenderDrawRect(renderer, &resetRect);
+		SDL_RenderDrawRect(renderer, &ScreenshotRect);
 
 		// The size slider
 		slider(renderer, 1, WIDTH - 100.0f - 40.0f, HEIGHT - UIrect.h / 2, 100.0f, &Brush.size, 0, 31,

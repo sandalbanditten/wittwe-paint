@@ -5,9 +5,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 
 #include "slider.h"
 #include "circle.h"
+#include "image.h"
 
 #define NAME "Wittwe Paint"
 
