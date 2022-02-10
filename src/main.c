@@ -162,7 +162,7 @@ int main(int argc, char **argv) {
 
 		// Present the renderer and wait two milliseconds
 		SDL_RenderPresent(renderer);
-		// SDL_Delay(2);
+		SDL_Delay(1);
 	}
 
 	// Cleaning up
