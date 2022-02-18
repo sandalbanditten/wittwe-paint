@@ -3,7 +3,7 @@
 
 #include <SDL2/SDL.h>
 
-// Draws a filled circle
+// Draws a circle, if fill is true
 void DrawCircle(SDL_Renderer * renderer, int x, int y, int radius, int fill);
 
 #endif

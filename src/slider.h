@@ -11,6 +11,7 @@
 float clampf(float v, float lo, float hi);
 // Lerps between two floats
 float lerpf(float a, float b, float t);
+// Lerps between two floats, but interpolated
 float ilerpf(float a, float b, float v);
 // Draws a slider, that modifies 'value'
 void slider(SDL_Renderer *renderer, int id,

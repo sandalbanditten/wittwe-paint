@@ -56,7 +56,7 @@ int main(int argc, char **argv) {
 		.w = UIrect.h / 2,
 		.h = UIrect.h / 4,
 		.x = WIDTH / 2,
-		.y = HEIGHT - UIrect.h * 0.75f + UIrect.h / 4
+		.y = HEIGHT - UIrect.h * 0.75f + (UIrect.h >> 2)
 	};
 
 	SDL_Rect resetRect2 = {
@@ -151,17 +151,17 @@ int main(int argc, char **argv) {
 		SDL_RenderDrawRect(renderer, &exitRect);
 
 		// The size slider
-		slider(renderer, 1, WIDTH - 100.0f - 40.0f, HEIGHT - UIrect.h / 2,
+		slider(renderer, 1, WIDTH - 100.0f - 40.0f, HEIGHT - (UIrect.h >> 1),
 				100.0f, &Brush.size, 0, 31, Brush.size, Brush.r, Brush.g, Brush.b);
 		// Color sliders
 		// Red
-		slider(renderer, 2, 40.0f, HEIGHT - UIrect.h / 2,
+		slider(renderer, 2, 40.0f, HEIGHT - (UIrect.h >> 1),
 				127.0f, &Brush.r, 0, 255, Brush.size, Brush.r, Brush.g, Brush.b);
 		// Green
-		slider(renderer, 3, 127.0f + 80.0f, HEIGHT - UIrect.h / 2,
+		slider(renderer, 3, 127.0f + 80.0f, HEIGHT - (UIrect.h >> 1),
 				127.0f, &Brush.g, 0, 255, Brush.size, Brush.r, Brush.g, Brush.b);
 		// Blue
-		slider(renderer, 4, 254.0f + 120.0f, HEIGHT - UIrect.h / 2,
+		slider(renderer, 4, 254.0f + 120.0f, HEIGHT - (UIrect.h >> 1),
 				127.0f, &Brush.b, 0, 255, Brush.size, Brush.r, Brush.g, Brush.b);
 
 		// First fill, and then outline
