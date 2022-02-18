@@ -26,8 +26,7 @@ int main(int argc, char **argv) {
 
 	// Creating the renderer
 	SDL_Renderer* renderer = SDL_CreateRenderer(
-			window, -1, SDL_RENDERER_ACCELERATED
-			);
+			window, -1, SDL_RENDERER_ACCELERATED);
 
 	if (!renderer) {
 		SDL_DestroyWindow(window);
@@ -52,7 +51,7 @@ int main(int argc, char **argv) {
 		.y = 0
 	};
 
-	// The button for resseting the canvas
+	// The button for resetting the canvas
 	SDL_Rect resetRect = {
 		.w = UIrect.h / 2,
 		.h = UIrect.h / 4,
@@ -102,20 +101,26 @@ int main(int argc, char **argv) {
 
 		// Interacting with UI
 		if (buttons & SDL_BUTTON_LMASK) {
+			// Drawing
 			if (SDL_PointInRect(&Brush.loc, &CanvasRect)) {
 				SDL_SetRenderDrawColor(renderer, Brush.r, Brush.g, Brush.b, 255);
 				DrawCircle(renderer, Brush.loc.x, Brush.loc.y, Brush.size, 1);
+				// Resetting
 			} else if (SDL_PointInRect(&Brush.loc, &resetRect)) {
 				SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 				SDL_RenderClear(renderer);
+				// Colored reset
 			} else if (SDL_PointInRect(&Brush.loc, &resetRect2)) {
 				SDL_SetRenderDrawColor(renderer, Brush.r, Brush.g, Brush.b, 255);
 				SDL_RenderClear(renderer);
+				// Screenshotting
 			} else if (SDL_PointInRect(&Brush.loc, &screenshotRect)) {
 				saveScreenshot("screenshot.bmp", renderer, CanvasRect);
+				// Quitting
 			} else if (SDL_PointInRect(&Brush.loc, &exitRect)) {
 				quit = 1;
 			}
+			// Erasing
 		} else if (buttons & SDL_BUTTON_RMASK) {
 			if (SDL_PointInRect(&Brush.loc, &CanvasRect)) {
 				SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
@@ -146,15 +151,18 @@ int main(int argc, char **argv) {
 		SDL_RenderDrawRect(renderer, &exitRect);
 
 		// The size slider
-		slider(renderer, 1, WIDTH - 100.0f - 40.0f, HEIGHT - UIrect.h / 2, 100.0f, &Brush.size, 0, 31,
-				Brush.size, Brush.r, Brush.g, Brush.b);
+		slider(renderer, 1, WIDTH - 100.0f - 40.0f, HEIGHT - UIrect.h / 2,
+				100.0f, &Brush.size, 0, 31, Brush.size, Brush.r, Brush.g, Brush.b);
 		// Color sliders
-		slider(renderer, 2, 40.0f, HEIGHT - UIrect.h / 2, 127.0f, &Brush.r, 0, 255,
-				Brush.size, Brush.r, Brush.g, Brush.b);
-		slider(renderer, 3, 127.0f + 80.0f, HEIGHT - UIrect.h / 2, 127.0f, &Brush.g, 0, 255,
-				Brush.size, Brush.r, Brush.g, Brush.b);
-		slider(renderer, 4, 254.0f + 120.0f, HEIGHT - UIrect.h / 2, 127.0f, &Brush.b, 0, 255,
-				Brush.size, Brush.r, Brush.g, Brush.b);
+		// Red
+		slider(renderer, 2, 40.0f, HEIGHT - UIrect.h / 2,
+				127.0f, &Brush.r, 0, 255, Brush.size, Brush.r, Brush.g, Brush.b);
+		// Green
+		slider(renderer, 3, 127.0f + 80.0f, HEIGHT - UIrect.h / 2,
+				127.0f, &Brush.g, 0, 255, Brush.size, Brush.r, Brush.g, Brush.b);
+		// Blue
+		slider(renderer, 4, 254.0f + 120.0f, HEIGHT - UIrect.h / 2,
+				127.0f, &Brush.b, 0, 255, Brush.size, Brush.r, Brush.g, Brush.b);
 
 		// First fill, and then outline
 		SDL_SetRenderDrawColor(renderer, Brush.r, Brush.g, Brush.b, 255);
@@ -162,7 +170,7 @@ int main(int argc, char **argv) {
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 		DrawCircle(renderer, 800.0f, HEIGHT - UIrect.h / 2, Brush.size, 0);
 
-		// Present the renderer and wait two milliseconds
+		// Present the renderer and wait a milliseconds
 		SDL_RenderPresent(renderer);
 		SDL_Delay(1);
 	}

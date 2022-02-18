@@ -4,6 +4,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
-int saveScreenshot(const char* location, SDL_Renderer *renderer, SDL_Rect area);
+void saveScreenshot(const char* location, SDL_Renderer *renderer, SDL_Rect area);
 
 #endif
